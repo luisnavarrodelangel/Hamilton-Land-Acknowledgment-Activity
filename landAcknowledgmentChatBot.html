@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Interactive Land Acknowledgment – Hamilton</title>
+    <script src="https://unpkg.com/vue@2.7.14/dist/vue.js"></script> <!-- Vue 2 options-style -->
+    <style>
+        /* Simple solemn, clean styles */
+        :root {
+            --bg: #f6f7f8;
+            --card: #ffffff;
+            --muted: #666;
+            --accent: #2b4a62;
+            --accent-2: #7c9aa3;
+        }
+
+        body {
+            font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: linear-gradient(180deg, #eef3f5 0%, var(--bg) 100%);
+            margin: 0;
+            color: #111;
+            padding: 24px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.6rem;
+            color: var(--accent)
+        }
+
+        p.lead {
+            color: var(--muted);
+            margin-top: 6px
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 6px 18px rgba(26, 38, 46, 0.06);
+            margin-bottom: 14px
+        }
+
+        .muted {
+            color: var(--muted)
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-top: 8px
+        }
+
+        input[type="number"] {
+            width: 140px;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ddd
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer
+        }
+
+        .btn.secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid #e0e6ea
+        }
+
+        .small {
+            font-size: 0.9rem
+        }
+
+        .item-title {
+            font-weight: 700;
+            margin-bottom: 4px
+        }
+
+        .progress {
+            height: 12px;
+            background: #e9eef0;
+            border-radius: 999px;
+            overflow: hidden
+        }
+
+        .progress>i {
+            display: block;
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            width: 0%
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .center {
+            text-align: center
+        }
+
+        .hidden {
+            display: none
+        }
+
+        footer {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 18px
+        }
+
+        .danger {
+            color: #7a2a2a
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #e0e6ea
+        }
+
+        .flex {
+            display: flex;
+            gap: 12px;
+            align-items: center
+        }
+
+        .pill {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #f1f6f8;
+            border: 1px solid #e6eef1
+        }
+
+        .controls-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .muted-block {
+            background: #fbfdfe;
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid #eef6f8
+        }
+
+        .saved {
+            color: green;
+            font-weight: 600
+        }
+
+        .not-saved {
+            color: #b05a00;
+            font-weight: 600
+        }
+
+        .notice {
+            background: #fff6e9;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #fae5bf;
+            color: #6b3d00
+        }
+
+        @media (max-width:700px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch
+            }
+
+            input[type="number"] {
+                width: 100%
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" class="container" v-cloak>
+        <header>
+            <h1>Hamilton Land Acknowledgment Activity </h1>
+            <p class="lead">Reflect on gifts characterized as payments
+                during colonization and to assign a contemporary value to them.</p>
+        </header>
+
+        <!-- Decision tree start -->
+        <div class="card" v-if="!started">
+            <h3>Begin</h3>
+            <p class="muted">We will ask a few contextual questions to ensure this tool is being used in the intended
+                place and to provide treaty context.</p>
+
+            <div style="margin-top:12px">
+                <label>Are you currently in Hamilton, ON?</label>
+                <div class="flex">
+                    <button class="btn" @click="answerInHamilton(true)">Yes</button>
+                    <button class="btn secondary" @click="answerInHamilton(false)">No</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- If not in Hamilton -->
+        <div class="card" v-if="started && !isHamilton">
+            <h3>Location Notice</h3>
+            <p>At the moment this tool has been developed for those in Hamilton. You can continue to explore the
+                material, but please note the local treaty context is specific to Hamilton.</p>
+            <div style="margin-top:10px">
+                <!-- <button class="btn" @click="continueAnyway">Continue</button> -->
+                <button class="btn secondary" @click="reset">Start Over</button>
+            </div>
+        </div>
+
+        <!-- If in Hamilton: treaty prompts -->
+        <div class="card" v-if="started && isHamilton && awareOfTreaty === null">
+            <h3>Traditional territories</h3>
+            <p>Then, you're interacting with me from the traditional territories of the Anishinabewaki ᐊᓂᔑᓈᐯᐗᑭ, the
+                Ho-de-no-sau-nee-ga (Haudenosaunee), the Attiwonderonk (Neutral), the Mississauga, and the Mississaugas
+                of the Credit First Nation. Are you aware of the treaty governing this area?</p>
+            <div class="flex" style="margin-top:10px">
+                <button class="btn" @click="setAware(true)">Yes</button>
+                <button class="btn secondary" @click="setAware(false)">No</button>
+            </div>
+        </div>
+
+        <!-- if aware true -->
+        <div class="card" v-if="started && isHamilton && awareOfTreaty && !familiarWithSpecifics">
+            <h3>Familiarity</h3>
+            <p>Are you familiar with the specifics of this treaty?</p>
+            <div class="flex" style="margin-top:10px">
+                <button class="btn" @click="setFamiliar(true)">Yes</button>
+                <button class="btn secondary" @click="setFamiliar(false)">No</button>
+            </div>
+        </div>
+
+        <!-- If aware false branch shows it Treaty No. 3 -->
+        <div class="card"
+            v-if="started && isHamilton && !awareOfTreaty && awareInfoShown && familiarWithSpecifics === null">
+            <h3>About the Treaty</h3>
+            <p class="muted">It's the <strong>Between the Lakes Treaty</strong>, also known as <strong>Treaty
+                    No.3</strong>.</p>
+            <p>Are you familiar with the specifics of this treaty?</p>
+            <div style="margin-top:8px">
+                <button class="btn" @click="setFamiliar(true)">Yes</button>
+                <button class="btn secondary" @click="setFamiliar(false)">No</button>
+            </div>
+        </div>
+        <!-- Familiar = true branch -->
+        <div class="card" v-if="familiarWithSpecifics === true && !inActivity && !contextDone">
+            <h3>Historical Context</h3>
+            <p>In 1784, during initial treaty negotiations the British Crown gave the Mississauga of the Credit numerous
+                trade goods including clothing, guns and ammunition. Many of these treaties at this time are poorly
+                documented. As a result, we do not have a detailed list of the gifts provided and their quantities.</p>
+            <p>I am going to provide a list of gifts typically provided in treaty negotiations, extrapolated from
+                existing sources.</p>
+            <div style="margin-top:8px">
+                <button class="btn" @click="finishContext">Continue</button>
+            </div>
+        </div>
+
+        <!-- Familiar = false branch (treaty explanation first) -->
+        <div class="card" v-if="familiarWithSpecifics === false && !contextShown && !inActivity">
+            <h3>About the Treaty</h3>
+            <p>The <strong>Between the Lakes Treaty</strong>, also known as Treaty No 3, was a significant agreement
+                between the British Crown and the Mississaugas of the Credit First Nation. The treaty covers the
+                territory lying and being between Lake Ontario and Lake Erie, hence 'between the lakes'.</p>
+            <div style="margin-top:8px">
+                <button class="btn" @click="showContext">Continue</button>
+            </div>
+        </div>
+
+        <!-- Context after false branch -->
+        <div class="card" v-if="familiarWithSpecifics === false && contextShown && !inActivity && !contextDone">
+            <h3>Historical Context</h3>
+            <p>In 1784, during initial treaty negotiations the British Crown gave the Mississauga of the Credit numerous
+                trade goods including clothing, guns and ammunition. Many of these treaties at this time are poorly
+                documented. As a result, we do not have a detailed list of the gifts provided and their quantities.</p>
+            <p>I am going to provide a list of gifts typically provided in treaty negotiations, extrapolated from
+                existing sources.</p>
+            <div style="margin-top:8px">
+                <button class="btn" @click="finishContext">Continue</button>
+            </div>
+        </div>
+
+        <!-- About the activity card -->
+        <div class="card" v-if="contextDone && !inActivity">
+            <h3>About the Activity</h3>
+            <p>In the next section, you will see a list of gifts that were typically given by the British Crown during
+                treaty negotiations. Your task is to assign a contemporary value in today’s Canadian dollars to each
+                gift.</p>
+            <p>At the end, you will see the total of your assigned values and a comparison to the cost of houses, land,
+                or other items today. This is meant to prompt reflection on whether these trade goods could ever truly
+                represent fair payment for land and its stewardship.</p>
+            <div style="margin-top:8px">
+                <button class="btn" @click="enterActivity">Continue to activity</button>
+            </div>
+        </div>
+
+
+
+        <!-- Main activity -->
+        <div v-if="inActivity">
+            <!-- Item viewer -->
+            <div class="card">
+                <div class="summary-row">
+                    <div>
+                        <div class="pill small">Item {{ currentIndex + 1 }} of {{ items.length }}</div>
+                        <div style="margin-top:8px">
+                            <div class="item-title">{{ currentItem.name }}</div>
+                            <div class="muted">{{ currentItem.desc }}</div>
+                        </div>
+                    </div>
+                    <div class="center" style="min-width:220px">
+                        <div class="muted">Saved value</div>
+                        <div style="font-size:1.25rem;font-weight:700"
+                            v-if="savedValues[currentItem.key] !== undefined">${{
+                            formatNumber(savedValues[currentItem.key]) }}</div>
+                        <div class="muted" v-else>— not saved —</div>
+                    </div>
+                </div>
+
+                <hr style="margin:12px 0" />
+
+                <div>
+                    <label>Assign a <em>today's</em> value (in CAD) — how much do you think this is worth now?</label>
+                    <div class="controls-vertical">
+                        <div class="controls">
+                            <input type="range" min="0" :max="maxValue" step="1" v-model.number="workingValue" />
+                            <input type="number" :min="0" :max="maxValue" v-model.number="workingValue" />
+                        </div>
+                        <div class="flex">
+                            <button class="btn" @click="saveValue">Save value for this item</button>
+                            <button class="btn secondary" @click="clearValue">Clear</button>
+                            <button class="btn secondary" @click="skipItem">Skip</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:12px" class="muted-block">
+                        <div class="muted small">Tip: use the slider for quick estimates, or type a precise number.
+                            Values are stored in your browser.</div>
+                    </div>
+                </div>
+
+                <div style="margin-top:14px" class="progress" aria-hidden="true">
+                    <i :style="{width: progressPercent + '%'}"></i>
+                </div>
+
+                <div style="margin-top:12px;display:flex;justify-content:space-between">
+                    <div>
+                        <button class="btn secondary" @click="prevItem" :disabled="currentIndex === 0">Previous</button>
+                        <button class="btn" @click="nextItem" :disabled="currentIndex >= items.length-1">Next</button>
+                    </div>
+                    <div class="muted small">Total saved items: {{ Object.keys(savedValues).length }} / {{ items.length
+                        }}</div>
+                </div>
+            </div>
+
+            <!-- Summary + calculator -->
+            <div class="card">
+                <h3>Calculator & comparisons</h3>
+                <p class="muted small">Total the values you've saved. Adjust the sample contemporary prices below to
+                    reflect current local values if you'd like.</p>
+
+                <div style="display:flex;gap:12px;flex-wrap:wrap">
+                    <div style="flex:1;min-width:220px">
+                        <label>Total of saved values (CAD)</label>
+                        <div style="font-size:1.6rem;font-weight:700">${{ formatNumber(totalSaved) }}</div>
+                        <div class="muted small">This number is the sum of all values you saved for items above.</div>
+                    </div>
+
+                    <div style="flex:1;min-width:220px">
+                        <label>Comparison price examples (editable)</label>
+                        <div style="display:flex;gap:8px;align-items:center">
+                            <input type="text" v-model="comparisons.house.label"
+                                style="flex:1;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
+                            <input type="number" v-model.number="comparisons.house.price"
+                                style="width:140px;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
+                        </div>
+                        <div style="margin-top:8px;display:flex;gap:8px">
+                            <input type="text" v-model="comparisons.land.label"
+                                style="flex:1;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
+                            <input type="number" v-model.number="comparisons.land.price"
+                                style="width:140px;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
+                        </div>
+                        <div style="margin-top:8px;display:flex;gap:8px">
+                            <input type="text" v-model="comparisons.car.label"
+                                style="flex:1;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
+                            <input type="number" v-model.number="comparisons.car.price"
+                                style="width:140px;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
+                        </div>
+                    </div>
+                </div>
+
+                <hr style="margin:12px 0" />
+
+                <div>
+                    <div class="small muted">What could the total buy?</div>
+                    <ul>
+                        <li>{{ comparisons.house.label }}: {{ affordCount(comparisons.house.price) }}</li>
+                        <li>{{ comparisons.land.label }}: {{ affordCount(comparisons.land.price) }}</li>
+                        <li>{{ comparisons.car.label }}: {{ affordCount(comparisons.car.price) }}</li>
+                    </ul>
+                </div>
+
+                <div style="margin-top:12px">
+                    <label>Reflection prompt</label>
+                    <textarea v-model="reflection"
+                        placeholder="Was this value fair? What things/lands/houses could this amount buy today?"></textarea>
+                </div>
+
+                <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+                    <button class="btn" @click="exportSummary">Copy results</button>
+                    <button class="btn secondary" @click="reset">Reset everything</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="muted small">This is a prototype educational tool designed for reflection. Historical context is
+                condensed here — consult community sources and Indigenous knowledge-keepers for deeper learning.</div>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
