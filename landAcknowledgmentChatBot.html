@@ -16,14 +16,31 @@
             --accent-2: #7c9aa3;
         }
 
-        body {
+        /* body {
             font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
             background: linear-gradient(180deg, #eef3f5 0%, var(--bg) 100%);
             margin: 0;
             color: #111;
             padding: 24px;
             -webkit-font-smoothing: antialiased;
+        } */
+        body {
+            font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background-image: url('images/map.png');
+            background-repeat: repeat;
+            /* repeat in both x and y */
+            background-position: top left;
+            /* optional: start tiling from top left */
+            background-attachment: fixed;
+            /* optional: scrolls with content or stays fixed */
+            background-size: 20rem 20rem;
+            /* each tile is 100px square */
+
+            color: #111;
+            padding: 24px;
         }
+
+
 
         .container {
             max-width: 980px;
@@ -50,7 +67,14 @@
             border-radius: 12px;
             padding: 18px;
             box-shadow: 0 6px 18px rgba(26, 38, 46, 0.06);
-            margin-bottom: 14px
+            margin-bottom: 14px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 24px rgba(26, 38, 46, 0.12);
         }
 
         .muted {
@@ -66,7 +90,8 @@
         .controls {
             display: flex;
             gap: 12px;
-            align-items: center;
+            align-items: right;
+            margin-left: 50%;
             margin-top: 8px
         }
 
@@ -202,22 +227,44 @@
                 width: 100%
             }
         }
+
+        .blur-container {
+            backdrop-filter: blur(12px);
+            /* blur the background */
+            -webkit-backdrop-filter: blur(12px);
+            /* for Safari */
+            background: rgba(255, 255, 255, 0.7);
+            /* semi-transparent overlay */
+            border-radius: 16px;
+            /* optional, soft edges */
+            padding: 24px;
+            /* margin: 16px; */
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            /* subtle depth */
+        }
     </style>
 </head>
 
 <body>
-    <div id="app" class="container" v-cloak>
+    <div id="app" class="container blur-container" v-cloak>
         <header>
             <h1>Hamilton Land Acknowledgment Activity </h1>
-            <p class="lead">Reflect on gifts characterized as payments
+            <p class="lead">This activity is about reflecting on gifts characterized as payments
                 during colonization and to assign a contemporary value to them.</p>
+            <p class="lead">This tool was developed based on the Window Shopping For “the Purchase” activity developed
+                by the Talking Treaties Collective in their book, <a href="https://talkingtreaties.ca/"
+                    target="_blank">A Treat Guide for Torontonians</a>.
+
         </header>
+
 
         <!-- Decision tree start -->
         <div class="card" v-if="!started">
-            <h3>Begin</h3>
-            <p class="muted">We will ask a few contextual questions to ensure this tool is being used in the intended
-                place and to provide treaty context.</p>
+            <h3>Welcome!</h3>
+
+
+            To begin, we will ask a few contextual questions to ensure this tool is being used in the intended
+            place and to provide treaty context.</p>
 
             <div style="margin-top:12px">
                 <label>Are you currently in Hamilton, ON?</label>
@@ -242,17 +289,36 @@
         <!-- If in Hamilton: treaty prompts -->
         <div class="card" v-if="started && isHamilton && awareOfTreaty === null">
             <h3>Traditional territories</h3>
-            <p>Then, you're interacting with me from the traditional territories of the Anishinabewaki ᐊᓂᔑᓈᐯᐗᑭ, the
-                Ho-de-no-sau-nee-ga (Haudenosaunee), the Attiwonderonk (Neutral), the Mississauga, and the Mississaugas
-                of the Credit First Nation. Are you aware of the treaty governing this area?</p>
-            <div class="flex" style="margin-top:10px">
-                <button class="btn" @click="setAware(true)">Yes</button>
-                <button class="btn secondary" @click="setAware(false)">No</button>
+            <p>Then, you're interacting with me from the traditional territories of the <a
+                    href="https://native-land.ca/listings/territories/anishinabek-%E1%90%8A%E1%93%82%E1%94%91%E1%93%88%E1%90%AF%E1%92%83"
+                    target="_blank">Anishinabewaki
+                    ᐊᓂᔑᓈᐯᐗᑭ</a>, the
+                <a href="https://native-land.ca/listings/territories/haudenosauneega-confederacy"
+                    target="_blank">Ho-de-no-sau-nee-ga (Haudenosaunee)</a>, the <a
+                    href="https://native-land.ca/listings/territories/attiwonderonk-neutral"
+                    target="_blank">Attiwonderonk
+                    (Neutral)</a>, the
+                <a href="https://native-land.ca/listings/territories/mississauga?lang=fr"
+                    target="_blank">Mississauga</a>, and the<a
+                    href="https://native-land.ca/listings/territories/mississaugas-of-the-credit-first-nation"
+                    target="_blank">
+                    Mississaugas
+                    of the Credit First Nation
+                </a>.
+            </p>
+
+            <div style="margin-top:12px">
+                <label> Are you aware of the treaty governing this area?
+                </label>
+                <div class="flex" style="margin-top:10px">
+                    <button class="btn" @click="setAware(true)">Yes</button>
+                    <button class="btn secondary" @click="setAware(false)">No</button>
+                </div>
             </div>
         </div>
 
         <!-- if aware true -->
-        <div class="card" v-if="started && isHamilton && awareOfTreaty && !familiarWithSpecifics">
+        <div class="card" v-if="started && isHamilton && awareOfTreaty && familiarWithSpecifics === null">
             <h3>Familiarity</h3>
             <p>Are you familiar with the specifics of this treaty?</p>
             <div class="flex" style="margin-top:10px">
@@ -275,23 +341,35 @@
         </div>
         <!-- Familiar = true branch -->
         <div class="card" v-if="familiarWithSpecifics === true && !inActivity && !contextDone">
-            <h3>Historical Context</h3>
-            <p>In 1784, during initial treaty negotiations the British Crown gave the Mississauga of the Credit numerous
-                trade goods including clothing, guns and ammunition. Many of these treaties at this time are poorly
-                documented. As a result, we do not have a detailed list of the gifts provided and their quantities.</p>
-            <p>I am going to provide a list of gifts typically provided in treaty negotiations, extrapolated from
-                existing sources.</p>
-            <div style="margin-top:8px">
-                <button class="btn" @click="finishContext">Continue</button>
+            <h3>Between the Lakes Treaty of 1792 - Historical Context</h3>
+            <p>In 1784, during initial negotiations for the Between the Lakes Treaty, the British Crown gifted the
+                Mississauga of the Credit numerous trade goods including clothing, guns and ammunition. These
+                <strong>gifts</strong> were
+                often characterized as <strong>payment</strong> by the British in Historical Records.
+            </p>
+
+            <div style="margin-top:12px">
+                <label>As mentioned earlier, this treaty is sometimes referred to as the “Between the Lakes Purchase”.
+                    Let’s
+                    think about the value of these gifts for this “purchase”. </label>
+                <div style="margin-top:8px">
+                    <button class="btn" @click="finishContext">Continue</button>
+                </div>
             </div>
         </div>
 
         <!-- Familiar = false branch (treaty explanation first) -->
         <div class="card" v-if="familiarWithSpecifics === false && !contextShown && !inActivity">
             <h3>About the Treaty</h3>
-            <p>The <strong>Between the Lakes Treaty</strong>, also known as Treaty No 3, was a significant agreement
-                between the British Crown and the Mississaugas of the Credit First Nation. The treaty covers the
-                territory lying and being between Lake Ontario and Lake Erie, hence 'between the lakes'.</p>
+            <p>The treaty governing this area is the <b>Between the Lakes Treaty of 1792</b>. It is sometimes referred
+                to as
+                the Between the Lakes Purchase or Treaty No. 3. <strong>
+                    Consider the implications of framing it as a treaty
+                    versus a purchase.
+                </strong> </p>
+            <!-- <p>The <strong>Between the Lakes Treaty</strong>, also known as Treaty No 3, was a significant agreement
+                    between the British Crown and the Mississaugas of the Credit First Nation. The treaty covers the
+                    territory lying and being between Lake Ontario and Lake Erie, hence 'between the lakes'.</p> -->
             <div style="margin-top:8px">
                 <button class="btn" @click="showContext">Continue</button>
             </div>
@@ -299,28 +377,48 @@
 
         <!-- Context after false branch -->
         <div class="card" v-if="familiarWithSpecifics === false && contextShown && !inActivity && !contextDone">
-            <h3>Historical Context</h3>
-            <p>In 1784, during initial treaty negotiations the British Crown gave the Mississauga of the Credit numerous
-                trade goods including clothing, guns and ammunition. Many of these treaties at this time are poorly
-                documented. As a result, we do not have a detailed list of the gifts provided and their quantities.</p>
-            <p>I am going to provide a list of gifts typically provided in treaty negotiations, extrapolated from
-                existing sources.</p>
-            <div style="margin-top:8px">
-                <button class="btn" @click="finishContext">Continue</button>
+            <h3>Between the Lakes Treaty of 1792 - Historical Context</h3>
+            <p>In 1784, during initial negotiations for the Between the Lakes Treaty, the British Crown gifted the
+                Mississauga of the Credit numerous trade goods including clothing, guns and ammunition. These
+                <strong>gifts</strong> were
+                often characterized as <strong>payment</strong> by the British in Historical Records.
+            </p>
+
+            <div style="margin-top:12px">
+                <label>As mentioned earlier, this treaty is sometimes referred to as the “Between the Lakes Purchase”.
+                    Let’s
+                    think about the value of these gifts for this “purchase”. </label>
+                <div style="margin-top:8px">
+                    <button class="btn" @click="finishContext">Continue</button>
+                </div>
             </div>
         </div>
 
         <!-- About the activity card -->
-        <div class="card" v-if="contextDone && !inActivity">
+        <div class="card" v-if="contextDone && !inActivity && !showSummary">
             <h3>About the Activity</h3>
-            <p>In the next section, you will see a list of gifts that were typically given by the British Crown during
+            <p>
+                In the next section, you will see a list of gifts that were typically given by the British Crown during
                 treaty negotiations. Your task is to assign a contemporary value in today’s Canadian dollars to each
-                gift.</p>
-            <p>At the end, you will see the total of your assigned values and a comparison to the cost of houses, land,
-                or other items today. This is meant to prompt reflection on whether these trade goods could ever truly
-                represent fair payment for land and its stewardship.</p>
-            <div style="margin-top:8px">
-                <button class="btn" @click="enterActivity">Continue to activity</button>
+                gift.
+                <br><br>
+                At the end, you will see the total of your assigned values and a comparison to the cost of houses, land,
+                or
+                other items today. If you like, do some online research to help you calculate the cost.
+                <br><br>
+                <strong>Please note:</strong> Many treaties from this time period are poorly documented. As a result, we
+                do not have a
+                comprehensive list of the gifts provided—or their quantities—for the Between the Lakes Treaty.
+
+            </p>
+            <div style="margin-top:12px">
+                <label>The list of
+                    gifts used in this activity is based on items typically given during treaty negotiations, with both
+                    the
+                    items and their quantities extrapolated from existing historical records.</label>
+                <div style="margin-top:8px">
+                    <button class="btn" @click="enterActivity">Continue to activity</button>
+                </div>
             </div>
         </div>
 
@@ -328,125 +426,146 @@
 
         <!-- Main activity -->
         <div v-if="inActivity">
-            <!-- Item viewer -->
-            <div class="card">
+            <div v-for="item in items" :key="item.key" class="card" style="margin-bottom: 20px;">
+                <!-- Header -->
                 <div class="summary-row">
                     <div>
-                        <div class="pill small">Item {{ currentIndex + 1 }} of {{ items.length }}</div>
-                        <div style="margin-top:8px">
-                            <div class="item-title">{{ currentItem.name }}</div>
-                            <div class="muted">{{ currentItem.desc }}</div>
-                        </div>
-                    </div>
-                    <div class="center" style="min-width:220px">
-                        <div class="muted">Saved value</div>
-                        <div style="font-size:1.25rem;font-weight:700"
-                            v-if="savedValues[currentItem.key] !== undefined">${{
-                            formatNumber(savedValues[currentItem.key]) }}</div>
-                        <div class="muted" v-else>— not saved —</div>
+                        <div class="item-title">{{ item.name }}</div>
                     </div>
                 </div>
 
                 <hr style="margin:12px 0" />
 
-                <div>
-                    <label>Assign a <em>today's</em> value (in CAD) — how much do you think this is worth now?</label>
-                    <div class="controls-vertical">
-                        <div class="controls">
-                            <input type="range" min="0" :max="maxValue" step="1" v-model.number="workingValue" />
-                            <input type="number" :min="0" :max="maxValue" v-model.number="workingValue" />
-                        </div>
-                        <div class="flex">
-                            <button class="btn" @click="saveValue">Save value for this item</button>
-                            <button class="btn secondary" @click="clearValue">Clear</button>
-                            <button class="btn secondary" @click="skipItem">Skip</button>
-                        </div>
-                    </div>
 
-                    <div style="margin-top:12px" class="muted-block">
-                        <div class="muted small">Tip: use the slider for quick estimates, or type a precise number.
-                            Values are stored in your browser.</div>
+                <!-- Controls -->
+                <!-- <div>
+                    <div class="controls">
+                    <label>Assign a <em>today's</em> value (in CAD):</label>
+                    
+                        <input type="range" min="0" :max="maxValue" step="1" v-model.number="savedValues[item.key]" />
+                        <input type="number" :min="0" :max="maxValue" v-model.number="savedValues[item.key]" />
                     </div>
+                </div>-->
+
+                <!-- Inside your item card -->
+                <div class="controls" style="margin-top: 8px; display: flex; gap: 12px; align-items: center;">
+                    <input type="range" min="0" :max="maxValue" step="1" v-model.number="savedValues[item.key]"
+                        style="flex: 1;" />
+                    <span style="font-weight: 600;">
+                        {{ formatCurrency(savedValues[item.key]) }}
+                    </span>
                 </div>
 
-                <div style="margin-top:14px" class="progress" aria-hidden="true">
-                    <i :style="{width: progressPercent + '%'}"></i>
+                <!-- Image -->
+                <div style="margin-bottom: 12px;">
+                    <img :src="item.img" :alt="item.name" style="max-width: 200px; height: auto;" />
                 </div>
 
-                <div style="margin-top:12px;display:flex;justify-content:space-between">
-                    <div>
-                        <button class="btn secondary" @click="prevItem" :disabled="currentIndex === 0">Previous</button>
-                        <button class="btn" @click="nextItem" :disabled="currentIndex >= items.length-1">Next</button>
-                    </div>
-                    <div class="muted small">Total saved items: {{ Object.keys(savedValues).length }} / {{ items.length
-                        }}</div>
-                </div>
             </div>
 
-            <!-- Summary + calculator -->
-            <div class="card">
-                <h3>Calculator & comparisons</h3>
-                <p class="muted small">Total the values you've saved. Adjust the sample contemporary prices below to
-                    reflect current local values if you'd like.</p>
-
-                <div style="display:flex;gap:12px;flex-wrap:wrap">
-                    <div style="flex:1;min-width:220px">
-                        <label>Total of saved values (CAD)</label>
-                        <div style="font-size:1.6rem;font-weight:700">${{ formatNumber(totalSaved) }}</div>
-                        <div class="muted small">This number is the sum of all values you saved for items above.</div>
-                    </div>
-
-                    <div style="flex:1;min-width:220px">
-                        <label>Comparison price examples (editable)</label>
-                        <div style="display:flex;gap:8px;align-items:center">
-                            <input type="text" v-model="comparisons.house.label"
-                                style="flex:1;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
-                            <input type="number" v-model.number="comparisons.house.price"
-                                style="width:140px;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
-                        </div>
-                        <div style="margin-top:8px;display:flex;gap:8px">
-                            <input type="text" v-model="comparisons.land.label"
-                                style="flex:1;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
-                            <input type="number" v-model.number="comparisons.land.price"
-                                style="width:140px;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
-                        </div>
-                        <div style="margin-top:8px;display:flex;gap:8px">
-                            <input type="text" v-model="comparisons.car.label"
-                                style="flex:1;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
-                            <input type="number" v-model.number="comparisons.car.price"
-                                style="width:140px;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
-                        </div>
-                    </div>
-                </div>
-
-                <hr style="margin:12px 0" />
-
-                <div>
-                    <div class="small muted">What could the total buy?</div>
-                    <ul>
-                        <li>{{ comparisons.house.label }}: {{ affordCount(comparisons.house.price) }}</li>
-                        <li>{{ comparisons.land.label }}: {{ affordCount(comparisons.land.price) }}</li>
-                        <li>{{ comparisons.car.label }}: {{ affordCount(comparisons.car.price) }}</li>
-                    </ul>
-                </div>
-
-                <div style="margin-top:12px">
-                    <label>Reflection prompt</label>
-                    <textarea v-model="reflection"
-                        placeholder="Was this value fair? What things/lands/houses could this amount buy today?"></textarea>
-                </div>
-
-                <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
-                    <button class="btn" @click="exportSummary">Copy results</button>
-                    <button class="btn secondary" @click="reset">Reset everything</button>
-                </div>
+            <!-- Bottom controls -->
+            <div style="margin-top:20px; text-align:right;">
+                <button class="btn" @click="calculateAndNext">Calculate</button>
             </div>
         </div>
 
-        <footer>
-            <div class="muted small">This is a prototype educational tool designed for reflection. Historical context is
-                condensed here — consult community sources and Indigenous knowledge-keepers for deeper learning.</div>
-        </footer>
+        <!-- Summary + calculator -->
+        <div v-if="showSummary" class="card">
+            <h3>Calculated Amount</h3>
+            <p class="muted small">
+                This number is the sum of all values you saved for items in the last page.
+            </p>
+
+            <!-- Totals -->
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+                <div style="flex:1;min-width:220px">
+                    <div style="font-size:1.6rem;font-weight:700">
+                        {{ formatCurrency(totalSaved) }}
+                    </div>
+                </div>
+                <!-- 
+    <div style="flex:1;min-width:220px">
+      <label>Comparison price examples (editable)</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="text" v-model="comparisons.house.label"
+          style="flex:1;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
+        <input type="number" v-model.number="comparisons.house.price"
+          style="width:140px;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
+      </div>
+      <div style="margin-top:8px;display:flex;gap:8px">
+        <input type="text" v-model="comparisons.land.label"
+          style="flex:1;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
+        <input type="number" v-model.number="comparisons.land.price"
+          style="width:140px;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
+      </div>
+      <div style="margin-top:8px;display:flex;gap:8px">
+        <input type="text" v-model="comparisons.car.label"
+          style="flex:1;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
+        <input type="number" v-model.number="comparisons.car.price"
+          style="width:140px;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
+      </div>
+    </div> -->
+            </div>
+
+            <hr style="margin:12px 0" />
+
+            <!-- Affordability -->
+            <div>
+                <h3>What could the total buy?</h3>
+                <ul>
+                    <li>{{ comparisons.house.label }}: {{comparisons.house.price }}</li>
+                    <li>{{ comparisons.land.label }}: {{ comparisons.land.price }}</li>
+                    <li>{{ comparisons.car.label }}: {{ comparisons.car.price }}</li>
+                </ul>
+            </div>
+            <hr style="margin:12px 0" />
+
+            <!-- Reflection questions -->
+            <div style="margin-top:16px">
+                <h3>Final Reflections</h3>
+                <div class="reflection-question" style="margin-top:8px">
+                    <p>1. Consider the cost of these gifts in relation to the cost of purchasing a single home in
+                        Hamilton today.</p>
+
+                </div>
+
+                <div class="reflection-question" style="margin-top:12px">
+                    <p>2. How many homes could you purchase if you exchanged the total value of the gifts you
+                        calculated?</p>
+
+                </div>
+
+                <div class="reflection-question" style="margin-top:12px">
+                    <p>3. What about the gift the Mississauga would have offered the British? Why are they absent from
+                        the historical record?</p>
+
+                </div>
+
+                <div class="reflection-question" style="margin-top:12px">
+                    <p>4. Consider the centrality of gift giving and reciprocity in Indigenous cultures. The exchange of
+                        gifts signifies ongoing reciprocal relationships. What are some gifts or services the
+                        Mississaugas might have offered to the British during treaty negotiations? Deduct their value
+                        from the value of the gifts you provided.</p>
+
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">
+                <button class="btn secondary" @click="reset">Start from the beginning</button>
+            </div>
+        </div>
+
+
+
+    </div>
+
+    <footer  class="blur-container">
+        <div class="muted small">This is a prototype educational tool designed for reflection. Historical
+            context is
+            condensed here — consult community sources and Indigenous knowledge-keepers for deeper learning.
+        </div>
+    </footer>
     </div>
 
     <script src="app.js"></script>

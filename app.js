@@ -11,23 +11,31 @@ new Vue({
         contextShown: false,
         contextDone: false,
         inActivity: false,
+        showSummary: false,
 
         // Items (from your list)
         items: [
-            { key: 'clothing_generic', name: 'Clothing (various cloths & pieces)', desc: 'Includes bales of stroud, molton, broad cloth, serge, patterned flannel, trunks of linen, ribbons, hats and related cloth items.' },
-            { key: 'barley_beads', name: 'Barley corn beads', desc: 'Beads used to make necklaces, bracelets, and clothing embellishments.' },
-            { key: 'gartering', name: 'Barrel of gartering', desc: 'Gartering used for clothing and personal items.' },
-            { key: 'guns_boxes', name: 'Boxes of guns', desc: 'Three boxes of guns (firearms).' },
-            { key: 'gun_powder', name: 'Gun powder', desc: 'Six half-sized barrels of gun powder.' },
-            { key: 'lead_shot', name: 'Lead shot (cases & kegs)', desc: 'Cases of lead shot and kegs of lead balls, used as ammunition.' },
-            { key: 'gun_flints', name: 'Gun flints', desc: 'Approximately 1,400 gun flints used for ignition.' },
-            { key: 'ag_hoes', name: 'Agricultural hoes and knives', desc: 'Tools that could be used for farming and daily tasks.' },
-            { key: 'rum_tobacco', name: 'Rum & tobacco', desc: 'Consumable goods sometimes given as part of exchanges.' },
-            { key: 'brass_kettles', name: 'Brass kettles', desc: 'Used for cooking and families\' daily tasks.' },
-            { key: 'looking_glasses', name: 'Looking glasses (mirrors)', desc: 'Handheld or small framed mirrors.' },
-            { key: 'fish_hooks', name: 'Fish hooks', desc: 'Fishing gear for food procurement.' },
-            { key: 'blankets', name: 'Blankets', desc: 'Woven blankets for warmth and trade.' },
-            { key: 'ribbons_case', name: 'Ribbons & small items', desc: 'Pieces of ribbon, embellishments, and small trade goods.' }
+            // { key: 'clothing_generic', name: 'Clothing (various cloths & pieces)', desc: 'Includes bales of stroud, molton, broad cloth, serge, patterned flannel, trunks of linen, ribbons, hats and related cloth items.' },
+            { key: 'stroud', name: '4 bales of stroud', img: "images/balesOfStroud.png", desc: 'Beads used to make necklaces, bracelets, and clothing embellishments.' },
+            { key: 'molton', name: '3 bales of molton cloth', img: "images/balesOfMolton.png", desc: 'Gartering used for clothing and personal items.' },
+            { key: 'broad', name: '1 bale of broad cloth', img: "images/broadcloth.png", desc: 'Three boxes of guns (firearms).' },
+            { key: 'serge', img: "images/serge.png", name: '3 pieces of embossed serge, a fabric used to make clothing', desc: 'Six half-sized barrels of gun powder.' },
+            { key: 'flannel', img: "images/flanel.png", name: '1 bale of patterned flannel cloth', desc: 'Cases of lead shot and kegs of lead balls, used as ammunition.' },
+            { key: 'linen', img: "images/linen.png", name: '3 trunks of linen cloth', desc: 'Approximately 1,400 gun flints used for ignition.' },
+            { key: 'laced_hats', img: "images/lacedHat.png", name: '17 laced hats', desc: 'Tools that could be used for farming and daily tasks.' },
+            { key: 'hats', img: "images/hats.png", name: '1 box of 60 hats', desc: 'Consumable goods sometimes given as part of exchanges.' },
+            // { key: 'brass_kettles', name: 'Brass kettles', desc: 'Used for cooking and families\' daily tasks.' },
+            // { key: 'looking_glasses', name: 'Looking glasses (mirrors)', desc: 'Handheld or small framed mirrors.' },
+            // { key: 'fish_hooks', name: 'Fish hooks', desc: 'Fishing gear for food procurement.' },
+            // { key: 'blankets', name: 'Blankets', desc: 'Woven blankets for warmth and trade.' },
+            // { key: 'ribbons_case', name: 'Ribbons & small items', desc: 'Pieces of ribbon, embellishments, and small trade goods.' }
+        ],
+
+        reflectionQuestions: [
+            "How did you decide how much value to assign to each item?",
+            "Were there any items you valued more or less than expected?",
+            "How would your allocations change if you had more (or fewer) resources?",
+            "What do your choices reveal about your priorities?"
         ],
         currentIndex: 0,
         workingValue: 0,
@@ -36,12 +44,10 @@ new Vue({
 
         // Comparisons (editable)
         comparisons: {
-            house: { label: 'Average house in Hamilton (example)', price: 700000 },
-            land: { label: 'Small urban lot (example)', price: 250000 },
-            car: { label: 'New small car (example)', price: 28000 }
+            house: { label: 'Average house in Hamilton', price: "$767,654"},
+            land: { label: 'Small urban lot', price: "$700,000–$900,000+" },
+            car: { label: 'New small car', price: "$26,565" }
         },
-
-        reflection: ''
     },
     computed: {
         currentItem() {
@@ -55,6 +61,20 @@ new Vue({
         }
     },
     methods: {
+
+        calculateAndNext() {
+            const total = Object.values(this.savedValues).reduce((a, b) => a + (b || 0), 0);
+            this.totalValue = total;
+            this.inActivity = false;
+            this.showSummary = true;
+        },
+        formatCurrency(value) {
+            if (value === undefined) return "$0.00";
+            return new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "USD"
+            }).format(value);
+        },
         // Decision tree handlers
         answerInHamilton(val) {
             this.started = true;
@@ -68,7 +88,7 @@ new Vue({
         continueAnyway() {
             // this.awareInfoShown = true;
         },
-      
+
         setAware(val) {
             this.awareOfTreaty = val;
             if (!val) {
@@ -97,8 +117,8 @@ new Vue({
             this.loadState();
         },
 
-          reset() {
-            if (!confirm('Reset this activity? This will clear saved values and answers.')) return;
+        reset() {
+            // if (!confirm('Reset this activity? This will clear saved values and answers.')) return;
             this.started = false;
             this.isHamilton = null;
             this.awareOfTreaty = null;
@@ -107,6 +127,7 @@ new Vue({
             this.contextShown = false;
             this.contextDone = false;
             this.inActivity = false;
+            this.showSummary=false;
             this.currentIndex = 0;
             this.workingValue = 0;
             this.savedValues = {};
