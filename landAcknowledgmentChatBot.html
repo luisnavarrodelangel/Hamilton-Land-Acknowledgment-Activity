@@ -26,7 +26,7 @@
         } */
         body {
             font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-            background-image: url('images/map.png');
+            background-image: url('images/treaty-3-map.jpg');
             background-repeat: repeat;
             /* repeat in both x and y */
             background-position: top left;
@@ -246,6 +246,7 @@
 </head>
 
 <body>
+
     <div id="app" class="container blur-container" v-cloak>
         <header>
             <h1>Hamilton Land Acknowledgment Activity </h1>
@@ -253,13 +254,13 @@
                 during colonization and to assign a contemporary value to them.</p>
             <p class="lead">This tool was developed based on the Window Shopping For “the Purchase” activity developed
                 by the Talking Treaties Collective in their book, <a href="https://talkingtreaties.ca/"
-                    target="_blank">A Treat Guide for Torontonians</a>.
+                    target="_blank">A Treaty Guide for Torontonians</a>.
 
         </header>
 
 
         <!-- Decision tree start -->
-        <div class="card" v-if="!started">
+        <div class="card" v-if="phase === 'intro'">
             <h3>Welcome!</h3>
 
 
@@ -276,7 +277,7 @@
         </div>
 
         <!-- If not in Hamilton -->
-        <div class="card" v-if="started && !isHamilton">
+        <div class="card" v-else-if="phase === 'answerInHamiltonFalse'">
             <h3>Location Notice</h3>
             <p>At the moment this tool has been developed for those in Hamilton. You can continue to explore the
                 material, but please note the local treaty context is specific to Hamilton.</p>
@@ -287,7 +288,7 @@
         </div>
 
         <!-- If in Hamilton: treaty prompts -->
-        <div class="card" v-if="started && isHamilton && awareOfTreaty === null">
+        <div class="card" v-else-if="phase === 'answerInHamiltonTrue'">
             <h3>Traditional territories</h3>
             <p>Then, you're interacting with me from the traditional territories of the <a
                     href="https://native-land.ca/listings/territories/anishinabek-%E1%90%8A%E1%93%82%E1%94%91%E1%93%88%E1%90%AF%E1%92%83"
@@ -318,7 +319,7 @@
         </div>
 
         <!-- if aware true -->
-        <div class="card" v-if="started && isHamilton && awareOfTreaty && familiarWithSpecifics === null">
+        <div class="card" v-else-if="phase === 'setAwareOfTreatyTrue'">
             <h3>Familiarity</h3>
             <p>Are you familiar with the specifics of this treaty?</p>
             <div class="flex" style="margin-top:10px">
@@ -328,8 +329,7 @@
         </div>
 
         <!-- If aware false branch shows it Treaty No. 3 -->
-        <div class="card"
-            v-if="started && isHamilton && !awareOfTreaty && awareInfoShown && familiarWithSpecifics === null">
+        <div class="card" v-else-if="phase === 'setAwareOfTreatyFalse'">
             <h3>About the Treaty</h3>
             <p class="muted">It's the <strong>Between the Lakes Treaty</strong>, also known as <strong>Treaty
                     No.3</strong>.</p>
@@ -340,7 +340,7 @@
             </div>
         </div>
         <!-- Familiar = true branch -->
-        <div class="card" v-if="familiarWithSpecifics === true && !inActivity && !contextDone">
+        <div class="card" v-else-if="phase === 'setFamiliarOfTreatyTrue'">
             <h3>Between the Lakes Treaty of 1792 - Historical Context</h3>
             <p>In 1784, during initial negotiations for the Between the Lakes Treaty, the British Crown gifted the
                 Mississauga of the Credit numerous trade goods including clothing, guns and ammunition. These
@@ -353,13 +353,13 @@
                     Let’s
                     think about the value of these gifts for this “purchase”. </label>
                 <div style="margin-top:8px">
-                    <button class="btn" @click="finishContext">Continue</button>
+                    <button class="btn" @click="aboutActivity">Continue</button>
                 </div>
             </div>
         </div>
 
         <!-- Familiar = false branch (treaty explanation first) -->
-        <div class="card" v-if="familiarWithSpecifics === false && !contextShown && !inActivity">
+        <div class="card" v-else-if="phase === 'setFamiliarOfTreatyFalse'">
             <h3>About the Treaty</h3>
             <p>The treaty governing this area is the <b>Between the Lakes Treaty of 1792</b>. It is sometimes referred
                 to as
@@ -371,31 +371,13 @@
                     between the British Crown and the Mississaugas of the Credit First Nation. The treaty covers the
                     territory lying and being between Lake Ontario and Lake Erie, hence 'between the lakes'.</p> -->
             <div style="margin-top:8px">
-                <button class="btn" @click="showContext">Continue</button>
+                <button class="btn" @click="setFamiliar(true)">Continue</button>
             </div>
         </div>
 
-        <!-- Context after false branch -->
-        <div class="card" v-if="familiarWithSpecifics === false && contextShown && !inActivity && !contextDone">
-            <h3>Between the Lakes Treaty of 1792 - Historical Context</h3>
-            <p>In 1784, during initial negotiations for the Between the Lakes Treaty, the British Crown gifted the
-                Mississauga of the Credit numerous trade goods including clothing, guns and ammunition. These
-                <strong>gifts</strong> were
-                often characterized as <strong>payment</strong> by the British in Historical Records.
-            </p>
-
-            <div style="margin-top:12px">
-                <label>As mentioned earlier, this treaty is sometimes referred to as the “Between the Lakes Purchase”.
-                    Let’s
-                    think about the value of these gifts for this “purchase”. </label>
-                <div style="margin-top:8px">
-                    <button class="btn" @click="finishContext">Continue</button>
-                </div>
-            </div>
-        </div>
 
         <!-- About the activity card -->
-        <div class="card" v-if="contextDone && !inActivity && !showSummary">
+        <div class="card" v-if="phase === 'aboutActivity'">
             <h3>About the Activity</h3>
             <p>
                 In the next section, you will see a list of gifts that were typically given by the British Crown during
@@ -406,18 +388,17 @@
                 or
                 other items today. If you like, do some online research to help you calculate the cost.
                 <br><br>
-                <strong>Please note:</strong> Many treaties from this time period are poorly documented. As a result, we
-                do not have a
-                comprehensive list of the gifts provided—or their quantities—for the Between the Lakes Treaty.
 
             </p>
             <div style="margin-top:12px">
-                <label>The list of
-                    gifts used in this activity is based on items typically given during treaty negotiations, with both
-                    the
-                    items and their quantities extrapolated from existing historical records.</label>
+                <label> Please note: Many treaties from this time period are poorly documented. As a
+                    result, we
+                    do not have a complete record of the gifts exchanged—or their quantities—for the Between the Lakes
+                    Treaty. The list of gifts used in this activity is based on items commonly given during treaty
+                    negotiations, with both the types and quantities extrapolated from existing historical
+                    records.</label>
                 <div style="margin-top:8px">
-                    <button class="btn" @click="enterActivity">Continue to activity</button>
+                    <button class="btn" @click="activity">Continue to activity</button>
                 </div>
             </div>
         </div>
@@ -425,7 +406,7 @@
 
 
         <!-- Main activity -->
-        <div v-if="inActivity">
+        <div v-else-if="phase === 'activity'">
             <div v-for="item in items" :key="item.key" class="card" style="margin-bottom: 20px;">
                 <!-- Header -->
                 <div class="summary-row">
@@ -435,17 +416,6 @@
                 </div>
 
                 <hr style="margin:12px 0" />
-
-
-                <!-- Controls -->
-                <!-- <div>
-                    <div class="controls">
-                    <label>Assign a <em>today's</em> value (in CAD):</label>
-                    
-                        <input type="range" min="0" :max="maxValue" step="1" v-model.number="savedValues[item.key]" />
-                        <input type="number" :min="0" :max="maxValue" v-model.number="savedValues[item.key]" />
-                    </div>
-                </div>-->
 
                 <!-- Inside your item card -->
                 <div class="controls" style="margin-top: 8px; display: flex; gap: 12px; align-items: center;">
@@ -465,12 +435,12 @@
 
             <!-- Bottom controls -->
             <div style="margin-top:20px; text-align:right;">
-                <button class="btn" @click="calculateAndNext">Calculate</button>
+                <button class="btn" @click="summary">Calculate</button>
             </div>
         </div>
 
         <!-- Summary + calculator -->
-        <div v-if="showSummary" class="card">
+        <div v-else-if="phase === 'summary'" class="card">
             <h3>Calculated Amount</h3>
             <p class="muted small">
                 This number is the sum of all values you saved for items in the last page.
@@ -483,28 +453,6 @@
                         {{ formatCurrency(totalSaved) }}
                     </div>
                 </div>
-                <!-- 
-    <div style="flex:1;min-width:220px">
-      <label>Comparison price examples (editable)</label>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input type="text" v-model="comparisons.house.label"
-          style="flex:1;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
-        <input type="number" v-model.number="comparisons.house.price"
-          style="width:140px;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
-      </div>
-      <div style="margin-top:8px;display:flex;gap:8px">
-        <input type="text" v-model="comparisons.land.label"
-          style="flex:1;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
-        <input type="number" v-model.number="comparisons.land.price"
-          style="width:140px;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
-      </div>
-      <div style="margin-top:8px;display:flex;gap:8px">
-        <input type="text" v-model="comparisons.car.label"
-          style="flex:1;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
-        <input type="number" v-model.number="comparisons.car.price"
-          style="width:140px;padding:8px;border-radius:6px;border:1px solid #e6eef1" />
-      </div>
-    </div> -->
             </div>
 
             <hr style="margin:12px 0" />
@@ -512,17 +460,14 @@
             <!-- Affordability -->
             <div>
                 <h3>What could the total buy?</h3>
+
+                <p>Compare the total value of the gifts you calculated to the following reference costs: </p>
                 <ul>
                     <li>{{ comparisons.house.label }}: {{comparisons.house.price }}</li>
                     <li>{{ comparisons.land.label }}: {{ comparisons.land.price }}</li>
                     <li>{{ comparisons.car.label }}: {{ comparisons.car.price }}</li>
                 </ul>
-            </div>
-            <hr style="margin:12px 0" />
 
-            <!-- Reflection questions -->
-            <div style="margin-top:16px">
-                <h3>Final Reflections</h3>
                 <div class="reflection-question" style="margin-top:8px">
                     <p>1. Consider the cost of these gifts in relation to the cost of purchasing a single home in
                         Hamilton today.</p>
@@ -532,38 +477,64 @@
                 <div class="reflection-question" style="margin-top:12px">
                     <p>2. How many homes could you purchase if you exchanged the total value of the gifts you
                         calculated?</p>
-
                 </div>
 
                 <div class="reflection-question" style="margin-top:12px">
-                    <p>3. What about the gift the Mississauga would have offered the British? Why are they absent from
-                        the historical record?</p>
-
+                    <p>3. What could you afford if you exchanged the total value of the gifts you calculated? </p>
                 </div>
 
                 <div class="reflection-question" style="margin-top:12px">
-                    <p>4. Consider the centrality of gift giving and reciprocity in Indigenous cultures. The exchange of
-                        gifts signifies ongoing reciprocal relationships. What are some gifts or services the
-                        Mississaugas might have offered to the British during treaty negotiations? Deduct their value
-                        from the value of the gifts you provided.</p>
+                    <p>4. Now what about the gifts the Mississauga would have offered the British? </p>
+                </div>
 
+                <div style="margin-top:8px">
+                    <button class="btn" @click="finalReflection">Continue</button>
                 </div>
             </div>
+            <hr style="margin:12px 0" />
+        </div>
+        <!-- Reflection questions -->
+        <div v-else-if="phase === 'finalReflection'" class="card">
+            <p>In many Indigenous cultures, including that of the Mississauga, gift-giving and reciprocity are central
+                practices—especially in the context of treaty negotiations. While we have clear records of the gifts
+                provided by the British, there is little documentation of what the Mississauga may have offered in
+                return. Why might their contributions be missing from the historical record?
 
-            <!-- Buttons -->
-            <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">
-                <button class="btn secondary" @click="reset">Start from the beginning</button>
-            </div>
+                <br></br>
+                Consider the types of gifts or services the Mississauga might have provided during treaty negotiations.
+                You can consider the value of:
+
+            <ul>
+                <li>Meat and game</li>
+                <li>Leather and fur goods</li>
+                <li>Herbal medicines and healing knowledge</li>
+                <li>Navigational expertise</li>
+                <li>Military service and strategic alliance</li>
+            </ul>
+
+            Assign an estimated cost or value to the Mississauga’s gifts and services.
+            </p>
         </div>
 
+        <!-- Buttons -->
+        <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn secondary" @click="reset">Start from the beginning</button>
+        </div>
+    </div>
 
 
     </div>
 
-    <footer  class="blur-container">
+
+    <footer class="blur-container">
         <div class="muted small">This is a prototype educational tool designed for reflection. Historical
             context is
             condensed here — consult community sources and Indigenous knowledge-keepers for deeper learning.
+
+            <br></br>
+            Background image: Grant to Joseph Brant, 1792 (map). Library and Archives Canada, item no. 2000215462.
+            Courtesy of <a href="https://hamiltoncivicmuseums.ca/exhibition/treaties/between-the-lakes-treaty-no-3/"
+                target="_blank">Hamilton Civic Museums</a>
         </div>
     </footer>
     </div>

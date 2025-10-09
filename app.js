@@ -3,15 +3,20 @@ new Vue({
     el: '#app',
     data: {
         // Decision tree
-        started: false,
-        isHamilton: null,
-        awareOfTreaty: null,
-        awareInfoShown: false,
-        familiarWithSpecifics: null,
-        contextShown: false,
-        contextDone: false,
-        inActivity: false,
-        showSummary: false,
+        // started: false,
+        // isHamilton: null,
+        // awareOfTreaty: null,
+        // awareInfoShown: false,
+        // familiarWithSpecifics: null,
+        // contextShown: false,
+        // contextDone: false,
+        // inActivity: false,
+        // showSummary: false,
+        // showFinalReflections: false,
+        phase: 'intro',
+        // intro | answerInHamiltonFalse | answerInHamiltonTrue | setAwareOfTreatyTrue | setAwareOfTreatyFalse| 
+        // setFamiliarOfTreatyTrue | setFamiliarOfTreatyFalse | aboutActivity | summary | finalReflection 
+
 
         // Items (from your list)
         items: [
@@ -24,11 +29,11 @@ new Vue({
             { key: 'linen', img: "images/linen.png", name: '3 trunks of linen cloth', desc: 'Approximately 1,400 gun flints used for ignition.' },
             { key: 'laced_hats', img: "images/lacedHat.png", name: '17 laced hats', desc: 'Tools that could be used for farming and daily tasks.' },
             { key: 'hats', img: "images/hats.png", name: '1 box of 60 hats', desc: 'Consumable goods sometimes given as part of exchanges.' },
-            // { key: 'brass_kettles', name: 'Brass kettles', desc: 'Used for cooking and families\' daily tasks.' },
-            // { key: 'looking_glasses', name: 'Looking glasses (mirrors)', desc: 'Handheld or small framed mirrors.' },
-            // { key: 'fish_hooks', name: 'Fish hooks', desc: 'Fishing gear for food procurement.' },
-            // { key: 'blankets', name: 'Blankets', desc: 'Woven blankets for warmth and trade.' },
-            // { key: 'ribbons_case', name: 'Ribbons & small items', desc: 'Pieces of ribbon, embellishments, and small trade goods.' }
+            { key: 'guns', img: "images/boxesOfGuns.png", name: '3 Boxes of Guns ', desc: 'Used for cooking and families\' daily tasks.' },
+            { key: 'gun_powder', img: "images/gunPowder.png", name: '6 half-sized barrels of gun powder', desc: 'Used for cooking and families\' daily tasks.' },
+            { key: 'lead_shot', img: "images/leadShot.png", name: '2 cases of lead shot, a type of ammunition used in muskets, and other early firearms', desc: 'Used for cooking and families\' daily tasks.' },
+            { key: 'gun_flints', img: "images/gunFlints.png", name: '1,400 gun flints, used as a source of ignition for firing', desc: 'Used for cooking and families\' daily tasks.' },
+            { key: 'lead_balls', img: "images/leadBalls.png", name: '7 kegs filled with lead balls, used for ammunition in firearms', desc: 'Used for cooking and families\' daily tasks.' },
         ],
 
         reflectionQuestions: [
@@ -39,12 +44,12 @@ new Vue({
         ],
         currentIndex: 0,
         workingValue: 0,
-        maxValue: 100000, // slider max — large enough for flexibility
+        maxValue: 10000, // slider max — large enough for flexibility
         savedValues: {},
 
         // Comparisons (editable)
         comparisons: {
-            house: { label: 'Average house in Hamilton', price: "$767,654"},
+            house: { label: 'Average house in Hamilton', price: "$767,654" },
             land: { label: 'Small urban lot', price: "$700,000–$900,000+" },
             car: { label: 'New small car', price: "$26,565" }
         },
@@ -62,12 +67,68 @@ new Vue({
     },
     methods: {
 
-        calculateAndNext() {
+        intro() { this.phase = 'intro'; },
+        awareOfTreaty() { this.phase = 'awareOfTreaty'; },
+        awareInfoShown() { this.phase = 'awareInfoShown'; },
+        familiarWithSpecifics() { this.phase = 'familiarWithSpecifics'; },
+        contextShown() { this.phase = 'contextShown'; },
+        contextDone() { this.phase = 'contextDone'; },
+        inActivity() { this.phase = 'activity'; },
+        showSummary() { this.phase = 'summary'; },
+        showFinalReflections() { this.phase = 'reflection'; },
+
+        answerInHamilton(val) {
+            if (val === true) {
+                this.phase = 'answerInHamiltonTrue';
+            } else {
+                this.phase = 'answerInHamiltonFalse';
+            }
+        },
+
+        setAware(val) {
+            if (val === true) {
+                this.phase = 'setAwareOfTreatyTrue';
+            } else {
+                this.phase = 'setAwareOfTreatyFalse';
+            }
+        },
+
+        setFamiliar(val) {
+            if (val === true) {
+                this.phase = 'setFamiliarOfTreatyTrue';
+            } else {
+                this.phase = 'setFamiliarOfTreatyFalse';
+            }
+        },
+
+        aboutActivity() { this.phase = 'aboutActivity'; },
+
+        activity() { this.phase = 'activity'; },
+
+        summary() {
             const total = Object.values(this.savedValues).reduce((a, b) => a + (b || 0), 0);
             this.totalValue = total;
-            this.inActivity = false;
-            this.showSummary = true;
+            this.phase = 'summary';
         },
+
+        finalReflection() { this.phase = 'finalReflection'; },
+
+        reset() {
+            this.phase = 'intro'; /* also reset values */
+            this.currentIndex = 0;
+            this.workingValue = 0;
+            this.savedValues = {};
+            localStorage.removeItem('landAck_savedValues');
+            localStorage.removeItem('landAck_state');
+        },
+
+
+        // calculateAndNext() {
+        //     const total = Object.values(this.savedValues).reduce((a, b) => a + (b || 0), 0);
+        //     this.totalValue = total;
+        //     this.inActivity = false;
+        //     this.showSummary = true;
+        // },
         formatCurrency(value) {
             if (value === undefined) return "$0.00";
             return new Intl.NumberFormat("en-US", {
@@ -75,85 +136,67 @@ new Vue({
                 currency: "USD"
             }).format(value);
         },
-        // Decision tree handlers
-        answerInHamilton(val) {
-            this.started = true;
-            this.isHamilton = val;
-            if (val) {
-                // ask next about treaty
-                this.awareOfTreaty = null;
-                this.awareInfoShown = false;
-            }
-        },
-        continueAnyway() {
-            // this.awareInfoShown = true;
-        },
+        // // Decision tree handlers
 
-        setAware(val) {
-            this.awareOfTreaty = val;
-            if (!val) {
-                // show info then continue
-                this.awareInfoShown = true;
-            }
-        },
-        setFamiliar(val) {
-            this.familiarWithSpecifics = val;
-            if (val === true) {
-                this.contextShown = true;   // show context right away
-                this.contextDone = false;
-            } else {
-                this.contextShown = false;  // wait for them to hit Continue in treaty info
-                this.contextDone = false;
-            }
-        },
-        showContext() {
-            this.contextShown = true;
-        },
-        finishContext() {
-            this.contextDone = true; // unlock "About the Activity"
-        },
-        enterActivity() {
-            this.inActivity = true;
-            this.loadState();
-        },
+        // continueAnyway() {
+        //     // this.awareInfoShown = true;
+        // },
 
-        reset() {
-            // if (!confirm('Reset this activity? This will clear saved values and answers.')) return;
-            this.started = false;
-            this.isHamilton = null;
-            this.awareOfTreaty = null;
-            this.awareInfoShown = false;
-            this.familiarWithSpecifics = null;
-            this.contextShown = false;
-            this.contextDone = false;
-            this.inActivity = false;
-            this.showSummary=false;
-            this.currentIndex = 0;
-            this.workingValue = 0;
-            this.savedValues = {};
-            this.reflection = '';
-            localStorage.removeItem('landAck_savedValues');
-            localStorage.removeItem('landAck_state');
-        },
+        // setAware(val) {
+        //     this.awareOfTreaty = val;
+        //     if (!val) {
+        //         // show info then continue
+        //         this.awareInfoShown = true;
+        //     }
+        // },
+        // setFamiliar(val) {
+        //     this.familiarWithSpecifics = val;
+        //     if (val === true) {
+        //         this.contextShown = true;   // show context right away
+        //         this.contextDone = false;
+        //     } else {
+        //         this.contextShown = false;  // wait for them to hit Continue in treaty info
+        //         this.contextDone = false;
+        //     }
+        // },
+        // showContext() {
+        //     this.contextShown = true;
+        // },
+        // finishContext() {
+        //     this.contextDone = true; // unlock "About the Activity"
+        // },
+        // enterActivity() {
+        //     this.inActivity = true;
+        //     this.loadState();
+        // },
 
-        // Item navigation
-        nextItem() {
-            if (this.currentIndex < this.items.length - 1) {
-                this.currentIndex++;
-                this.loadWorkingValue();
-            }
-        },
-        prevItem() {
-            if (this.currentIndex > 0) {
-                this.currentIndex--;
-                this.loadWorkingValue();
-            }
-        },
-        skipItem() {
-            // clear working value, move next
-            this.workingValue = 0;
-            this.nextItem();
-        },
+        // goToFinalReflections() {
+        //     this.showSummary = false;         // hide summary
+        //     this.showFinalReflections = true;
+        //     this.inActivity = false;
+
+        // },
+
+        // reset() {
+        //     // if (!confirm('Reset this activity? This will clear saved values and answers.')) return;
+        //     this.started = false;
+        //     this.isHamilton = null;
+        //     this.awareOfTreaty = null;
+        //     this.awareInfoShown = false;
+        //     this.familiarWithSpecifics = null;
+        //     this.contextShown = false;
+        //     this.contextDone = false;
+        //     this.inActivity = false;
+        //     this.showSummary = false;
+        //     this.showFinalReflections = false;
+        //     this.currentIndex = 0;
+        //     this.workingValue = 0;
+        //     this.savedValues = {};
+        //     this.reflection = '';
+        //     localStorage.removeItem('landAck_savedValues');
+        //     localStorage.removeItem('landAck_state');
+        // },
+
         saveValue() {
             const key = this.currentItem.key;
             const v = Number(this.workingValue || 0);
@@ -243,5 +286,12 @@ new Vue({
     mounted() {
         // on mount, load if user had partial progress
         this.loadState();
+
+        // set the items value to 0
+        this.items.forEach(item => {
+            if (this.savedValues[item.key] === undefined) {
+                this.savedValues[item.key] = 0; // default at min
+            }
+        });
     }
 });
