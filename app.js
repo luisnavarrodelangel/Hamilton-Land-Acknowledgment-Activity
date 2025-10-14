@@ -2,20 +2,10 @@
 new Vue({
     el: '#app',
     data: {
-        // Decision tree
-        // started: false,
-        // isHamilton: null,
-        // awareOfTreaty: null,
-        // awareInfoShown: false,
-        // familiarWithSpecifics: null,
-        // contextShown: false,
-        // contextDone: false,
-        // inActivity: false,
-        // showSummary: false,
-        // showFinalReflections: false,
+
         phase: 'intro',
         // intro | answerInHamiltonFalse | answerInHamiltonTrue | setAwareOfTreatyTrue | setAwareOfTreatyFalse| 
-        // setFamiliarOfTreatyTrue | setFamiliarOfTreatyFalse | aboutActivity | summary | finalReflection 
+        // setFamiliarOfTreatyTrue | setFamiliarOfTreatyFalse | aboutActivity | summary | activityMississaguaGifts | finalReflection 
 
 
         // Items (from your list)
@@ -36,6 +26,15 @@ new Vue({
             { key: 'lead_balls', img: "images/leadBalls.png", name: '7 kegs filled with lead balls, used for ammunition in firearms', desc: 'Used for cooking and families\' daily tasks.' },
         ],
 
+        itemMississaugaGifts: [
+            { key: 'Meat and game', img: "images/meatAndGame.png", desc: 'The Mississauga provided food resources, including meat and game, to support the sustenance of the settlers.' },
+            { key: 'Leather and fur goods', img: "images/leatherAndFur.png", desc: 'The Mississauga supplied leather and fur goods, which were essential for clothing, trade, and various utilitarian purposes.' },
+            { key: 'Herbal medicines and healing knowledge', img: "images/herbalMedicines.png", desc: 'The Mississauga shared their knowledge of herbal medicines and healing practices, contributing to the health and well-being of the settlers.' },
+            { key: 'Navigational expertise', img: "images/navigationalExpertise.png", desc: 'The Mississauga offered navigational expertise, helping settlers understand the local geography and navigate the land effectively.' },
+            { key: 'Military service and strategic alliance', img: "images/militaryService.png", desc: 'The Mississauga provided military service and formed strategic alliances with the settlers, offering protection and support in times of conflict.' }
+        ],
+
+
         reflectionQuestions: [
             "How did you decide how much value to assign to each item?",
             "Were there any items you valued more or less than expected?",
@@ -43,9 +42,13 @@ new Vue({
             "What do your choices reveal about your priorities?"
         ],
         currentIndex: 0,
+        currentIndexMississaugaGifts: 0,
         workingValue: 0,
+        workingValueMississaugaGifts: 0,
         maxValue: 10000, // slider max — large enough for flexibility
+        maxValueMississaugaGifts: 10000, // slider max — large enough for flexibility
         savedValues: {},
+        savedValuesMississaugaGifts: {},
 
         // Comparisons (editable)
         comparisons: {
@@ -58,12 +61,22 @@ new Vue({
         currentItem() {
             return this.items[this.currentIndex];
         },
-        progressPercent() {
-            return ((this.currentIndex + 1) / this.items.length) * 100;
+        currentItemMississaugaGifts() {
+            return this.itemMississaugaGifts[this.currentIndexMississaugaGifts];
         },
+
         totalSaved() {
             return Object.values(this.savedValues).reduce((s, v) => s + Number(v || 0), 0);
-        }
+        },
+
+        totalSavedMississaugaGifts() {
+            return Object.values(this.savedValuesMississaugaGifts).reduce((s, v) => s + Number(v || 0), 0);
+        },
+
+        differenceTotal() {
+            return Math.abs(this.totalSaved - this.totalSavedMississaugaGifts);
+        },
+
     },
     methods: {
 
@@ -73,8 +86,12 @@ new Vue({
         familiarWithSpecifics() { this.phase = 'familiarWithSpecifics'; },
         contextShown() { this.phase = 'contextShown'; },
         contextDone() { this.phase = 'contextDone'; },
+        activity() { this.phase = 'activity'; },
+        aboutActivity() { this.phase = 'aboutActivity'; },
         inActivity() { this.phase = 'activity'; },
         showSummary() { this.phase = 'summary'; },
+        summaryMississaguaItems() { this.phase = 'summaryMississaguaItems'; },
+        activityMississaguaGifts() { this.phase = 'activityMississaguaGifts'; },
         showFinalReflections() { this.phase = 'reflection'; },
 
         answerInHamilton(val) {
@@ -101,9 +118,7 @@ new Vue({
             }
         },
 
-        aboutActivity() { this.phase = 'aboutActivity'; },
 
-        activity() { this.phase = 'activity'; },
 
         summary() {
             const total = Object.values(this.savedValues).reduce((a, b) => a + (b || 0), 0);
@@ -116,19 +131,30 @@ new Vue({
         reset() {
             this.phase = 'intro'; /* also reset values */
             this.currentIndex = 0;
+            this.currentIndexMississaugaGifts = 0;
             this.workingValue = 0;
+            this.workingValueMississaugaGifts = 0;
             this.savedValues = {};
+            this.savedValuesMississaugaGifts = {};
             localStorage.removeItem('landAck_savedValues');
             localStorage.removeItem('landAck_state');
         },
 
+        finishActivity() {
+            this.phase = 'intro'; /* also reset values */
+            this.currentIndex = 0;
+            this.currentIndexMississaugaGifts = 0;
+            this.workingValue = 0;
+            this.workingValueMississaugaGifts = 0;
+            this.savedValues = {};
+            this.savedValuesMississaugaGifts = {};
+            localStorage.removeItem('landAck_savedValues');
+            localStorage.removeItem('landAck_state');
+            alert('Thank you for participating! Your responses have been cleared.');
+        },
 
-        // calculateAndNext() {
-        //     const total = Object.values(this.savedValues).reduce((a, b) => a + (b || 0), 0);
-        //     this.totalValue = total;
-        //     this.inActivity = false;
-        //     this.showSummary = true;
-        // },
+
+
         formatCurrency(value) {
             if (value === undefined) return "$0.00";
             return new Intl.NumberFormat("en-US", {
@@ -136,66 +162,6 @@ new Vue({
                 currency: "USD"
             }).format(value);
         },
-        // // Decision tree handlers
-
-        // continueAnyway() {
-        //     // this.awareInfoShown = true;
-        // },
-
-        // setAware(val) {
-        //     this.awareOfTreaty = val;
-        //     if (!val) {
-        //         // show info then continue
-        //         this.awareInfoShown = true;
-        //     }
-        // },
-        // setFamiliar(val) {
-        //     this.familiarWithSpecifics = val;
-        //     if (val === true) {
-        //         this.contextShown = true;   // show context right away
-        //         this.contextDone = false;
-        //     } else {
-        //         this.contextShown = false;  // wait for them to hit Continue in treaty info
-        //         this.contextDone = false;
-        //     }
-        // },
-        // showContext() {
-        //     this.contextShown = true;
-        // },
-        // finishContext() {
-        //     this.contextDone = true; // unlock "About the Activity"
-        // },
-        // enterActivity() {
-        //     this.inActivity = true;
-        //     this.loadState();
-        // },
-
-        // goToFinalReflections() {
-        //     this.showSummary = false;         // hide summary
-        //     this.showFinalReflections = true;
-        //     this.inActivity = false;
-
-        // },
-
-        // reset() {
-        //     // if (!confirm('Reset this activity? This will clear saved values and answers.')) return;
-        //     this.started = false;
-        //     this.isHamilton = null;
-        //     this.awareOfTreaty = null;
-        //     this.awareInfoShown = false;
-        //     this.familiarWithSpecifics = null;
-        //     this.contextShown = false;
-        //     this.contextDone = false;
-        //     this.inActivity = false;
-        //     this.showSummary = false;
-        //     this.showFinalReflections = false;
-        //     this.currentIndex = 0;
-        //     this.workingValue = 0;
-        //     this.savedValues = {};
-        //     this.reflection = '';
-        //     localStorage.removeItem('landAck_savedValues');
-        //     localStorage.removeItem('landAck_state');
-        // },
 
         saveValue() {
             const key = this.currentItem.key;
@@ -204,6 +170,15 @@ new Vue({
             this.persistState();
             alert('Value saved.');
         },
+
+        saveValueMississaugaGifts() {
+            const key = this.currentItemMississaugaGifts.key;
+            const v = Number(this.workingValueMississaugaGifts || 0);
+            this.$set(this.savedValuesMississaugaGifts, key, v);
+            this.persistState();
+            alert('Value saved.');
+        },
+
         clearValue() {
             const key = this.currentItem.key;
             this.workingValue = 0;
@@ -212,9 +187,24 @@ new Vue({
                 this.persistState();
             }
         },
+
+        clearValueMississaugaGifts() {
+            const key = this.currentItemMississaugaGifts.key;
+            this.workingValueMississaugaGifts = 0;
+            if (this.savedValuesMississaugaGifts[key] !== undefined) {
+                this.$delete(this.savedValuesMississaugaGifts, key);
+                this.persistState();
+            }
+        },
+
         loadWorkingValue() {
             const key = this.currentItem.key;
             this.workingValue = this.savedValues[key] !== undefined ? this.savedValues[key] : 0;
+        },
+
+        loadWorkingValueMississaugaGifts() {
+            const key = this.currentItemMississaugaGifts.key;
+            this.workingValueMississaugaGifts = this.savedValuesMississaugaGifts[key] !== undefined ? this.savedValuesMississaugaGifts[key] : 0;
         },
 
         affordCount(price) {
@@ -250,9 +240,12 @@ new Vue({
         persistState() {
             const state = {
                 savedValues: this.savedValues,
+                savedValuesMississaugaGifts: this.savedValuesMississaugaGifts,
                 comparisons: this.comparisons,
+
                 reflection: this.reflection,
-                currentIndex: this.currentIndex
+                currentIndex: this.currentIndex,
+                currentIndexMississaugaGifts: this.currentIndexMississaugaGifts
             };
             localStorage.setItem('landAck_savedValues', JSON.stringify(state));
         },
@@ -262,10 +255,13 @@ new Vue({
                 try {
                     const s = JSON.parse(raw);
                     this.savedValues = s.savedValues || {};
+                    this.savedValuesMississaugaGifts = s.savedValuesMississaugaGifts || {};
                     this.comparisons = s.comparisons || this.comparisons;
                     this.reflection = s.reflection || '';
                     this.currentIndex = s.currentIndex || 0;
+                    this.currentIndexMississaugaGifts = s.currentIndexMississaugaGifts || 0;
                     this.loadWorkingValue();
+                    this.loadWorkingValueMississaugaGifts();
                 } catch (e) {
                     console.warn('Could not load saved state', e);
                 }
@@ -274,6 +270,10 @@ new Vue({
     },
     watch: {
         savedValues: {
+            deep: true,
+            handler() { this.persistState(); }
+        },
+        savedValuesMississaugaGifts: {
             deep: true,
             handler() { this.persistState(); }
         },
@@ -292,6 +292,12 @@ new Vue({
             if (this.savedValues[item.key] === undefined) {
                 this.savedValues[item.key] = 0; // default at min
             }
+        });
+        this.itemMississaugaGifts.forEach(item => {
+            if (this.savedValuesMississaugaGifts[item.key] === undefined) {
+                this.savedValuesMississaugaGifts[item.key] = 0; // default at min
+            }
+
         });
     }
 });

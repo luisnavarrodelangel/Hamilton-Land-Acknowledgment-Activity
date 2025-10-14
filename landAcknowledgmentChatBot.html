@@ -434,7 +434,8 @@
             </div>
 
             <!-- Bottom controls -->
-            <div style="margin-top:20px; text-align:right;">
+             
+            <div style="margin-top:20px;" >
                 <button class="btn" @click="summary">Calculate</button>
             </div>
         </div>
@@ -488,13 +489,14 @@
                 </div>
 
                 <div style="margin-top:8px">
-                    <button class="btn" @click="finalReflection">Continue</button>
+                    <button class="btn" @click="activityMississaguaGifts">Continue</button>
                 </div>
             </div>
             <hr style="margin:12px 0" />
         </div>
-        <!-- Reflection questions -->
-        <div v-else-if="phase === 'finalReflection'" class="card">
+
+        <!-- Mississagua Items -->
+        <div v-else-if="phase === 'activityMississaguaGifts'" class="card">
             <p>In many Indigenous cultures, including that of the Mississauga, gift-giving and reciprocity are central
                 practices—especially in the context of treaty negotiations. While we have clear records of the gifts
                 provided by the British, there is little documentation of what the Mississauga may have offered in
@@ -502,19 +504,106 @@
 
                 <br></br>
                 Consider the types of gifts or services the Mississauga might have provided during treaty negotiations.
-                You can consider the value of:
+                <!-- You can consider the value of: -->
+                <br></br>
+                Assign an estimated cost or value to the Mississauga’s gifts and services.
 
-            <ul>
-                <li>Meat and game</li>
-                <li>Leather and fur goods</li>
-                <li>Herbal medicines and healing knowledge</li>
-                <li>Navigational expertise</li>
-                <li>Military service and strategic alliance</li>
-            </ul>
+            <div v-for="item in itemMississaugaGifts" :key="item.key" class="card" style="margin-bottom: 20px;">
+                <!-- Header -->
+                <div class="summary-row">
+                    <div>
+                        <div class="item-title">{{ item.name }}</div>
+                    </div>
+                </div>
 
-            Assign an estimated cost or value to the Mississauga’s gifts and services.
-            </p>
+                <hr style="margin:12px 0" />
+
+                <!-- Inside your item card -->
+                <div class="controls" style="margin-top: 8px; display: flex; gap: 12px; align-items: center;">
+                    <input type="range" min="0" :max="maxValue" step="1"
+                        v-model.number="savedValuesMississaugaGifts[item.key]" style="flex: 1;" />
+                    <span style="font-weight: 600;">
+                        {{ formatCurrency(savedValuesMississaugaGifts[item.key]) }}
+                    </span>
+                </div>
+
+                <!-- Image -->
+                <div style="margin-bottom: 12px;">
+                    <img :src="item.img" :alt="item.name" style="max-width: 200px; height: auto;" />
+                </div>
+
+            </div>
+
+            <!-- Bottom controls -->
+            <div style="margin-top:20px">
+                <button class="btn" @click="summaryMississaguaItems">Calculate</button>
+            </div>
         </div>
+
+
+        <!-- Summary Mississagua Items -->
+        <!-- Summary + calculator -->
+        <div v-else-if="phase === 'summaryMississaguaItems'" class="card">
+
+            <h3><i>Difference</i> Between the British gifts and the Mississauga Gifts</h3>
+            <p class="muted small">
+                This figure represents the total value of gifts provided by the British, minus the gifts provided by
+                the Mississaugas:
+            </p>
+
+            <!-- Totals -->
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+                <div style="flex:1;min-width:220px">
+                    <div style="font-size:1.6rem;font-weight:700">
+                        {{ formatCurrency(differenceTotal) }}
+                    </div>
+                </div>
+            </div>
+
+            <hr style="margin:12px 0" />
+
+            <div>
+                <h3>Discussion & Takeaway</h3>
+
+                <p>Discussions surrounding Treaty 3 began nearly a decade earlier, in 1784. <b>
+                    The British sought to
+                        survey and define the boundaries they claimed to have purchased
+                </b>, aiming to legitimize their
+                    acquisition in the 1792 version of the Treaty. 
+                    <br></br>
+                    However, <b>
+                        the Mississaugas understood the
+                        agreement differently — not as a sale that extinguished their rights to the land, but as a
+                        rental arrangement
+                    </b>. 
+                    <br></br>
+                    In their view, the land was shared with the British in exchange for gifts
+                    and presents given in perpetuity. For the Mississaugas, gift-giving was a normal exchange
+                    practice tied to land access and hunting rights, not a one-time payment for land ownership. </p>
+
+
+                <div class="reflection-question" style="margin-top:8px">
+                    <p>Consider the final figure above. Does this amount represent a fair one-time payment for all
+                        the land encompassed by Treaty 3?</p>
+
+                </div>
+                <hr style="margin:12px 0" />
+
+
+                <div class="reflection-question" style="margin-top:12px">
+                    <p>You have now reached the end of the activity. If you have any feedback for us, please email
+                        <b>mapref@mcmaster.ca</b>
+                    </p>
+                </div>
+
+                <div style="margin-top:8px">
+                    <button class="btn" @click="finishActivity">Finish Activity</button>
+                </div>
+            </div>
+            <hr style="margin:12px 0" />
+        </div>
+
+
 
         <!-- Buttons -->
         <div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end">
