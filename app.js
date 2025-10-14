@@ -1,61 +1,67 @@
-// app.js — Vue 2 (options API) prototype
-new Vue({
-    el: '#app',
-    data: {
+const app = Vue.createApp({
+    data() {
+        // const savedValues = {};
+        // items.forEach(item => savedValues[item.key] = 0);
 
-        phase: 'intro',
-        // intro | answerInHamiltonFalse | answerInHamiltonTrue | setAwareOfTreatyTrue | setAwareOfTreatyFalse| 
-        // setFamiliarOfTreatyTrue | setFamiliarOfTreatyFalse | aboutActivity | summary | activityMississaguaGifts | finalReflection 
+        // const savedValuesMississaugaGifts = {};
+        // itemMississaugaGifts.forEach(item => savedValuesMississaugaGifts[item.key] = 0);
 
-
-        // Items (from your list)
-        items: [
-            // { key: 'clothing_generic', name: 'Clothing (various cloths & pieces)', desc: 'Includes bales of stroud, molton, broad cloth, serge, patterned flannel, trunks of linen, ribbons, hats and related cloth items.' },
-            { key: 'stroud', name: '4 bales of stroud', img: "images/balesOfStroud.png", desc: 'Beads used to make necklaces, bracelets, and clothing embellishments.' },
-            { key: 'molton', name: '3 bales of molton cloth', img: "images/balesOfMolton.png", desc: 'Gartering used for clothing and personal items.' },
-            { key: 'broad', name: '1 bale of broad cloth', img: "images/broadcloth.png", desc: 'Three boxes of guns (firearms).' },
-            { key: 'serge', img: "images/serge.png", name: '3 pieces of embossed serge, a fabric used to make clothing', desc: 'Six half-sized barrels of gun powder.' },
-            { key: 'flannel', img: "images/flanel.png", name: '1 bale of patterned flannel cloth', desc: 'Cases of lead shot and kegs of lead balls, used as ammunition.' },
-            { key: 'linen', img: "images/linen.png", name: '3 trunks of linen cloth', desc: 'Approximately 1,400 gun flints used for ignition.' },
-            { key: 'laced_hats', img: "images/lacedHat.png", name: '17 laced hats', desc: 'Tools that could be used for farming and daily tasks.' },
-            { key: 'hats', img: "images/hats.png", name: '1 box of 60 hats', desc: 'Consumable goods sometimes given as part of exchanges.' },
-            { key: 'guns', img: "images/boxesOfGuns.png", name: '3 Boxes of Guns ', desc: 'Used for cooking and families\' daily tasks.' },
-            { key: 'gun_powder', img: "images/gunPowder.png", name: '6 half-sized barrels of gun powder', desc: 'Used for cooking and families\' daily tasks.' },
-            { key: 'lead_shot', img: "images/leadShot.png", name: '2 cases of lead shot, a type of ammunition used in muskets, and other early firearms', desc: 'Used for cooking and families\' daily tasks.' },
-            { key: 'gun_flints', img: "images/gunFlints.png", name: '1,400 gun flints, used as a source of ignition for firing', desc: 'Used for cooking and families\' daily tasks.' },
-            { key: 'lead_balls', img: "images/leadBalls.png", name: '7 kegs filled with lead balls, used for ammunition in firearms', desc: 'Used for cooking and families\' daily tasks.' },
-        ],
-
-        itemMississaugaGifts: [
-            { key: 'Meat and game', img: "images/meatAndGame.png", desc: 'The Mississauga provided food resources, including meat and game, to support the sustenance of the settlers.' },
-            { key: 'Leather and fur goods', img: "images/leatherAndFur.png", desc: 'The Mississauga supplied leather and fur goods, which were essential for clothing, trade, and various utilitarian purposes.' },
-            { key: 'Herbal medicines and healing knowledge', img: "images/herbalMedicines.png", desc: 'The Mississauga shared their knowledge of herbal medicines and healing practices, contributing to the health and well-being of the settlers.' },
-            { key: 'Navigational expertise', img: "images/navigationalExpertise.png", desc: 'The Mississauga offered navigational expertise, helping settlers understand the local geography and navigate the land effectively.' },
-            { key: 'Military service and strategic alliance', img: "images/militaryService.png", desc: 'The Mississauga provided military service and formed strategic alliances with the settlers, offering protection and support in times of conflict.' }
-        ],
+        return {
+            reflection: '',
+            phase: 'intro',
+            // intro | answerInHamiltonFalse | answerInHamiltonTrue | setAwareOfTreatyTrue | setAwareOfTreatyFalse| 
+            // setFamiliarOfTreatyTrue | setFamiliarOfTreatyFalse | aboutActivity | summary | activityMississaguaGifts | finalReflection 
 
 
-        reflectionQuestions: [
-            "How did you decide how much value to assign to each item?",
-            "Were there any items you valued more or less than expected?",
-            "How would your allocations change if you had more (or fewer) resources?",
-            "What do your choices reveal about your priorities?"
-        ],
-        currentIndex: 0,
-        currentIndexMississaugaGifts: 0,
-        workingValue: 0,
-        workingValueMississaugaGifts: 0,
-        maxValue: 10000, // slider max — large enough for flexibility
-        maxValueMississaugaGifts: 10000, // slider max — large enough for flexibility
-        savedValues: {},
-        savedValuesMississaugaGifts: {},
+            // Items (from your list)
+            items: [
+                // { key: 'clothing_generic', name: 'Clothing (various cloths & pieces)', desc: 'Includes bales of stroud, molton, broad cloth, serge, patterned flannel, trunks of linen, ribbons, hats and related cloth items.' },
+                { key: 'stroud', name: '4 bales of stroud', img: "images/balesOfStroud.png", desc: 'Beads used to make necklaces, bracelets, and clothing embellishments.' },
+                { key: 'molton', name: '3 bales of molton cloth', img: "images/balesOfMolton.png", desc: 'Gartering used for clothing and personal items.' },
+                { key: 'broad', name: '1 bale of broad cloth', img: "images/broadcloth.png", desc: 'Three boxes of guns (firearms).' },
+                { key: 'serge', img: "images/serge.png", name: '3 pieces of embossed serge, a fabric used to make clothing', desc: 'Six half-sized barrels of gun powder.' },
+                { key: 'flannel', img: "images/flanel.png", name: '1 bale of patterned flannel cloth', desc: 'Cases of lead shot and kegs of lead balls, used as ammunition.' },
+                { key: 'linen', img: "images/linen.png", name: '3 trunks of linen cloth', desc: 'Approximately 1,400 gun flints used for ignition.' },
+                { key: 'laced_hats', img: "images/lacedHat.png", name: '17 laced hats', desc: 'Tools that could be used for farming and daily tasks.' },
+                { key: 'hats', img: "images/hats.png", name: '1 box of 60 hats', desc: 'Consumable goods sometimes given as part of exchanges.' },
+                { key: 'guns', img: "images/boxesOfGuns.png", name: '3 Boxes of Guns ', desc: 'Used for cooking and families\' daily tasks.' },
+                { key: 'gun_powder', img: "images/gunPowder.png", name: '6 half-sized barrels of gun powder', desc: 'Used for cooking and families\' daily tasks.' },
+                { key: 'lead_shot', img: "images/leadShot.png", name: '2 cases of lead shot, a type of ammunition used in muskets, and other early firearms', desc: 'Used for cooking and families\' daily tasks.' },
+                { key: 'gun_flints', img: "images/gunFlints.png", name: '1,400 gun flints, used as a source of ignition for firing', desc: 'Used for cooking and families\' daily tasks.' },
+                { key: 'lead_balls', img: "images/leadBalls.png", name: '7 kegs filled with lead balls, used for ammunition in firearms', desc: 'Used for cooking and families\' daily tasks.' },
+            ],
 
-        // Comparisons (editable)
-        comparisons: {
-            house: { label: 'Average house in Hamilton', price: "$767,654" },
-            land: { label: 'Small urban lot', price: "$700,000–$900,000+" },
-            car: { label: 'New small car', price: "$26,565" }
-        },
+            itemMississaugaGifts: [
+                { key: 'Meat and game', img: "images/meatAndGame.png", desc: 'The Mississauga provided food resources, including meat and game, to support the sustenance of the settlers.' },
+                { key: 'Leather and fur goods', img: "images/leatherAndFur.png", desc: 'The Mississauga supplied leather and fur goods, which were essential for clothing, trade, and various utilitarian purposes.' },
+                { key: 'Herbal medicines and healing knowledge', img: "images/herbalMedicines.png", desc: 'The Mississauga shared their knowledge of herbal medicines and healing practices, contributing to the health and well-being of the settlers.' },
+                { key: 'Navigational expertise', img: "images/navigationalExpertise.png", desc: 'The Mississauga offered navigational expertise, helping settlers understand the local geography and navigate the land effectively.' },
+                { key: 'Military service and strategic alliance', img: "images/militaryService.png", desc: 'The Mississauga provided military service and formed strategic alliances with the settlers, offering protection and support in times of conflict.' }
+            ],
+
+
+            reflectionQuestions: [
+                "How did you decide how much value to assign to each item?",
+                "Were there any items you valued more or less than expected?",
+                "How would your allocations change if you had more (or fewer) resources?",
+                "What do your choices reveal about your priorities?"
+            ],
+            currentIndex: 0,
+            currentIndexMississaugaGifts: 0,
+            workingValue: 0,
+            workingValueMississaugaGifts: 0,
+            maxValue: 10000, // slider max — large enough for flexibility
+            maxValueMississaugaGifts: 10000, // slider max — large enough for flexibility
+            savedValues: {},
+            savedValuesMississaugaGifts: {},
+
+            // Comparisons (editable)
+            comparisons: {
+                house: { label: 'Average house in Hamilton', price: "$767,654" },
+                land: { label: 'Small urban lot', price: "$700,000–$900,000+" },
+                car: { label: 'New small car', price: "$26,565" }
+            },
+        };
     },
     computed: {
         currentItem() {
@@ -134,10 +140,16 @@ new Vue({
             this.currentIndexMississaugaGifts = 0;
             this.workingValue = 0;
             this.workingValueMississaugaGifts = 0;
-            this.savedValues = {};
-            this.savedValuesMississaugaGifts = {};
+            // this.savedValues = {};
+            // this.savedValuesMississaugaGifts = {};
+            this.items.forEach(item => this.savedValues[item.key] = 0);
+            this.itemMississaugaGifts.forEach(item => this.savedValuesMississaugaGifts[item.key] = 0);
+            this.reflection = '';
+
             localStorage.removeItem('landAck_savedValues');
             localStorage.removeItem('landAck_state');
+            alert('Your responses have been cleared.');
+
         },
 
         finishActivity() {
@@ -146,8 +158,12 @@ new Vue({
             this.currentIndexMississaugaGifts = 0;
             this.workingValue = 0;
             this.workingValueMississaugaGifts = 0;
-            this.savedValues = {};
-            this.savedValuesMississaugaGifts = {};
+            // this.savedValues = {};
+            // this.savedValuesMississaugaGifts = {};
+            this.items.forEach(item => this.savedValues[item.key] = 0);
+            this.itemMississaugaGifts.forEach(item => this.savedValuesMississaugaGifts[item.key] = 0);
+            this.reflection = '';
+
             localStorage.removeItem('landAck_savedValues');
             localStorage.removeItem('landAck_state');
             alert('Thank you for participating! Your responses have been cleared.');
@@ -166,7 +182,7 @@ new Vue({
         saveValue() {
             const key = this.currentItem.key;
             const v = Number(this.workingValue || 0);
-            this.$set(this.savedValues, key, v);
+            this.savedValues[key] = v;
             this.persistState();
             alert('Value saved.');
         },
@@ -174,7 +190,7 @@ new Vue({
         saveValueMississaugaGifts() {
             const key = this.currentItemMississaugaGifts.key;
             const v = Number(this.workingValueMississaugaGifts || 0);
-            this.$set(this.savedValuesMississaugaGifts, key, v);
+            this.savedValuesMississaugaGifts[key] = v;
             this.persistState();
             alert('Value saved.');
         },
@@ -183,7 +199,7 @@ new Vue({
             const key = this.currentItem.key;
             this.workingValue = 0;
             if (this.savedValues[key] !== undefined) {
-                this.$delete(this.savedValues, key);
+                delete this.savedValues[key];
                 this.persistState();
             }
         },
@@ -192,7 +208,7 @@ new Vue({
             const key = this.currentItemMississaugaGifts.key;
             this.workingValueMississaugaGifts = 0;
             if (this.savedValuesMississaugaGifts[key] !== undefined) {
-                this.$delete(this.savedValuesMississaugaGifts, key);
+                delete this.savedValuesMississaugaGifts[key];
                 this.persistState();
             }
         },
@@ -301,3 +317,5 @@ new Vue({
         });
     }
 });
+
+app.mount("#app");
