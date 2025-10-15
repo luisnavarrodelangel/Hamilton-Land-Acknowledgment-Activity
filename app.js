@@ -32,11 +32,11 @@ const app = Vue.createApp({
             ],
 
             itemMississaugaGifts: [
-                { key: 'Meat and game', img: "images/meatAndGame.png", desc: 'The Mississauga provided food resources, including meat and game, to support the sustenance of the settlers.' },
-                { key: 'Leather and fur goods', img: "images/leatherAndFur.png", desc: 'The Mississauga supplied leather and fur goods, which were essential for clothing, trade, and various utilitarian purposes.' },
-                { key: 'Herbal medicines and healing knowledge', img: "images/herbalMedicines.png", desc: 'The Mississauga shared their knowledge of herbal medicines and healing practices, contributing to the health and well-being of the settlers.' },
-                { key: 'Navigational expertise', img: "images/navigationalExpertise.png", desc: 'The Mississauga offered navigational expertise, helping settlers understand the local geography and navigate the land effectively.' },
-                { key: 'Military service and strategic alliance', img: "images/militaryService.png", desc: 'The Mississauga provided military service and formed strategic alliances with the settlers, offering protection and support in times of conflict.' }
+                { key: 'Meat and game',  name: 'Meat and game', img: "images/meatAndGame.png", desc: 'The Mississauga provided food resources, including meat and game, to support the sustenance of the settlers.' },
+                { key: 'Leather and fur goods', name: 'Leather and fur goods', img: "images/leatherAndFur.png", desc: 'The Mississauga supplied leather and fur goods, which were essential for clothing, trade, and various utilitarian purposes.' },
+                { key: 'Herbal medicines and healing knowledge', name: 'Herbal medicines and healing knowledge',  img: "images/herbalMedicines.png", desc: 'The Mississauga shared their knowledge of herbal medicines and healing practices, contributing to the health and well-being of the settlers.' },
+                { key: 'Navigational expertise',  name: 'Navigational expertise', img: "images/navigationalExpertise.png", desc: 'The Mississauga offered navigational expertise, helping settlers understand the local geography and navigate the land effectively.' },
+                { key: 'Military service and strategic alliance', name: 'Military service and strategic alliance', img: "images/militaryService.png", desc: 'The Mississauga provided military service and formed strategic alliances with the settlers, offering protection and support in times of conflict.' }
             ],
 
 
